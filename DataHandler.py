@@ -5,16 +5,36 @@ import json
 class ImgManifest():
 
 
-    CONFIG_PATH='config/'
+    _CONFIG_PATH='CONFIG'
 
     def __init__(self,idstr):
 
-        self.id = idstr
+        self._id = idstr
 
 
-    def manifest_exists(self):
+    '''
+    Attempts to create a new manifest file for a given ID, if that ID has not already been provisioned
+    Returns manifest_filename on success, and None on any writing failure
+    '''
+    def create(self):
 
-        filename=CONFIG_PATH+self.id
+
+        manifest_filename = "{}/{}.json".format(self._CONFIG_PATH,self._id)
+        manifest_skeleton = {'data':[],'checksum':'0'}
+
+        if not self._manifest_exists(manifest_filename):
+            try:
+                with open(manifest_filename,"w") as manifestFile:
+                    json.dump(str(manifest_skeleton),manifestFile)
+
+            except EnvironmentError:
+                manifest_filename = None
+
+        return manifest_filename
+
+
+    def _manifest_exists(self,filename):
+
         return os.path.isfile(filename)
 
 
@@ -38,4 +58,5 @@ def test_func():
 
 
 if __name__ == "__main__":
-    test_func()
+    imgm = ImgManifest("i001234")
+    print(imgm.create())
