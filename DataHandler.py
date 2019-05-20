@@ -1,6 +1,7 @@
 import os
 import json
 import hashlib
+from werkzeug.utils import secure_filename
 
 class ImgManifest():
 
@@ -74,6 +75,7 @@ class ImgManifest():
 
         if manifest != None and isinstance(img_filename,str):
             manifest['data'][img_filename]={"img_path":img_path}
+            manifest['checksum']=self._checksum(manifest)
 
         return self.write(manifest)
 
@@ -103,9 +105,27 @@ class ImgManifest():
 
 class DataHandler():
 
+
+    UPLOAD_FOLDER = 'IMG'
+    ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
     def __init__(self,idnum=None):
 
         self.id = idnum
+
+
+    def _allowed_extension(self, filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+    def write_image_file(self, file_data, filename):
+
+        if file_data and allowed_file(file_data.filename):
+            filename = secure_filename(file_data.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+
+        return filename
+
 
 
     def __str__(self):
@@ -116,12 +136,15 @@ class DataHandler():
 
 def test_func():
 
-    print("test")
+    imgm = ImgManifest("frame1")
+    print(imgm.create())
+    print(imgm.add_img("newPhoto1.png"))
+
+    imgm2 = ImgManifest("framex2")
+    print(imgm2.add_img("newPhoto1.png"))
+
 
 
 if __name__ == "__main__":
-    imgm = ImgManifest("frame1")
-    print(imgm.create())
-    print(imgm)
-    print(imgm.add_img("newPhoto1.png"))
-    print(imgm)
+
+    test_func()
