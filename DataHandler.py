@@ -26,6 +26,17 @@ class ImgManifest():
 
         return hashlib.md5(chkString).hexdigest()
 
+
+    def _get_client_manifest(self):
+
+        return self.read()
+
+
+    def _manifest_exists(self,filename):
+
+        return os.path.isfile(filename)
+
+
     '''
     Reads the contents of the manifest file
     '''
@@ -42,7 +53,6 @@ class ImgManifest():
                 pass
 
         return data
-
 
     '''
     Writes data to the specified file
@@ -97,10 +107,6 @@ class ImgManifest():
 
 
 
-    def _manifest_exists(self,filename):
-
-        return os.path.isfile(filename)
-
 
 
 class DataHandler():
@@ -115,14 +121,16 @@ class DataHandler():
 
 
     def _allowed_extension(self, filename):
-        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in self.ALLOWED_EXTENSIONS
 
 
     def write_image_file(self, file_data, filename):
 
-        if file_data and allowed_file(file_data.filename):
-            filename = secure_filename(file_data.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
+        if file_data and self._allowed_extension(filename):
+            filename = secure_filename(filename)
+            file_data.save(os.path.join(self.UPLOAD_FOLDER, filename))
+        else:
+            filename = None
 
         return filename
 
