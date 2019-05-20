@@ -2,6 +2,7 @@ import os
 import json
 import hashlib
 from werkzeug.utils import secure_filename
+import io
 
 class ImgManifest():
 
@@ -123,6 +124,14 @@ class DataHandler():
     def _allowed_extension(self, filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in self.ALLOWED_EXTENSIONS
 
+    def _get_extension(self,filename):
+        return filename.rsplit('.', 1)[1].upper()
+
+    def _exists(self,filename):
+
+        return os.path.isfile(filename)
+
+
 
     def write_image_file(self, file_data, filename):
 
@@ -135,24 +144,24 @@ class DataHandler():
         return filename
 
 
+    def read_image_file(self,filename):
+
+        data = None
+
+        file_path = "{}/{}".format(self.UPLOAD_FOLDER,filename)
+
+        if not self._exists(file_path):
+            return data
+
+
+        with open(file_path, 'rb') as fin:
+                data = io.BytesIO(fin.read())
+
+        return data
+
 
     def __str__(self):
 
         return str(self.id)
 
 
-
-def test_func():
-
-    imgm = ImgManifest("frame1")
-    print(imgm.create())
-    print(imgm.add_img("newPhoto1.png"))
-
-    imgm2 = ImgManifest("framex2")
-    print(imgm2.add_img("newPhoto1.png"))
-
-
-
-if __name__ == "__main__":
-
-    test_func()
