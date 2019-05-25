@@ -18,9 +18,12 @@ def get_dish():
         return "FamFrame v0.1"
 
 
+
 @app.route('/frame/healthcheck', methods=['GET'])
 def healthcheck():
         return "GOOD"
+
+
 
 
 @app.route('/frame/<frame_id>',methods=['GET'])
@@ -32,6 +35,24 @@ def get_manifest(frame_id):
         return "Not Found", 404
 
     return json.dumps(manifest._get_client_manifest())
+
+
+@app.route('/frame/<frame_id>',methods=['POST'])
+def create_manifest(frame_id):
+
+    manifest = ImgManifest(frame_id)
+    manifest_status = None
+
+    if not manifest._manifest_exists(manifest._filename):
+        manifest_status = manifest.create()
+
+        if manifest_status is None:
+           return "Error: Issue creating frame manifest file", 500
+
+
+    return json.dumps(manifest._get_client_manifest()), 200
+
+
 
 @app.route('/frame/<frame_id>/img/', methods=['POST'])
 def upload(frame_id):
@@ -58,6 +79,7 @@ def upload(frame_id):
         return "Error updating frame manifest", 500
 
     return manifest_filename, 200
+
 
 
 @app.route('/frame/<frame_id>/img/<filename>', methods=['GET'])
