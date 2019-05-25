@@ -22,9 +22,10 @@ class ImgManifest():
     def _checksum(self,data):
         chkString = ""
 
-        for entry in data:
+        for entry in data['data']:
             chkString+=str(entry)
 
+        print(chkString)
         return hashlib.md5(chkString).hexdigest()
 
 
@@ -66,7 +67,7 @@ class ImgManifest():
             with open(self._filename,'w') as manifest:
                 json.dump(data,manifest)
             filename = self._filename
-        except EnvrionmentError:
+        except EnvrionmentError, err:
             pass
 
         return filename
@@ -90,6 +91,21 @@ class ImgManifest():
 
         return self.write(manifest)
 
+
+    def del_img(self,img_filename):
+
+        if not self._manifest_exists(self._filename):
+            return None
+
+        manifest = self.read()
+
+        if(manifest['data'].get(img_filename,False)):
+
+         if manifest != None and isinstance(img_filename,str):
+            del manifest['data'][img_filename]
+            manifest['checksum']=self._checksum(manifest)
+
+        return self.write(manifest)
 
     '''
     Attempts to create a new manifest file for a given ID, if that ID has not already been provisioned
@@ -160,8 +176,25 @@ class DataHandler():
         return data
 
 
+
     def __str__(self):
 
         return str(self.id)
 
+
+if __name__ == "__main__":
+
+    x = ImgManifest("home_frame")
+    y = DataHandler("home_frame")
+
+
+    data = x.read()
+
+    if(filename in data.keys()):
+
+        status = y.del_image_file("002.jpg")
+        print(status)
+
+    if (status != None):
+        x.del_img("002.jpg")
 
