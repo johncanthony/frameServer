@@ -12,9 +12,8 @@ ABOUT_INFO="info.json"
 FamFrame Info Page
 '''
 @app.route('/frame',methods=['GET'])
-def get_dish():
-        a = DataHandler("1234")
-        print(a)
+def get_info():
+   
         return "FamFrame v0.1"
 
 
